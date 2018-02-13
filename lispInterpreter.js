@@ -3,7 +3,7 @@ exports.lisp = interpret
 let toParse = '(begin (define r 10)(* r 2)(+ r 20)(+ r 30))'
 
 function interpret (lispString) {
-  return evaluation(parse(toParse), env)
+  return evaluation(parse(lispString), env)
 }
 
 let env = {
@@ -12,6 +12,7 @@ let env = {
   '*': (x, y) => x * y,
   '/': (x, y) => x / y,
   '=': (x, y) => x === y,
+  'equal?': (x, y) => x === y,
   '<': (x, y) => x < y,
   '>': (x, y) => x > y,
   '<=': (x, y) => x <= y,
@@ -20,7 +21,12 @@ let env = {
   'begin': function () { 
     let expr = arguments[arguments.length - 1]
     return expr[expr.length - 1]
-  }
+  },
+  'max': (x, y) => x > y ? x : y,
+  'min': (x, y) => x < y ? x : y,
+  'length': x => x.length,
+  'null?': x => x === null,
+  'number?': x => Number.isFinite(x)
 }
 
 function tokenise (toParse) {
