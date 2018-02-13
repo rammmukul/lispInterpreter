@@ -1,7 +1,6 @@
 exports.lisp = interpret
 
 let toParse = `${process.argv[2]}`
-console.log(interpret(toParse))
 
 function interpret (lispString) {
   return evaluation(parse(lispString), env)
@@ -85,3 +84,5 @@ function evaluation (exp, env) {
     return args.reduce(proc)
   }
 }
+
+console.log(interpret(toParse))
