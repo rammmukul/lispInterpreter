@@ -1,6 +1,7 @@
 exports.lisp = interpret
 
-let toParse = '(begin (define r 10)(* r 2)(+ r 20)(+ r 30))'
+let toParse = `${process.argv[2]}`
+console.log(interpret(toParse))
 
 function interpret (lispString) {
   return evaluation(parse(lispString), env)
@@ -84,5 +85,3 @@ function evaluation (exp, env) {
     return args.reduce(proc)
   }
 }
-
-console.log(interpret(toParse))
