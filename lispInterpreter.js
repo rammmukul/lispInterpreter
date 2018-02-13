@@ -18,7 +18,7 @@ let env = {
   '<=': (x, y) => x <= y,
   '>=': (x, y) => x >= y,
   'not': (x) => !x,
-  'begin': function () { 
+  'begin': function () {
     let expr = arguments[arguments.length - 1]
     return expr[expr.length - 1]
   },
