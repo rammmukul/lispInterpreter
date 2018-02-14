@@ -39,3 +39,13 @@ test('Evaluate invalid input', () => {
   expect(() => lisp.lisp(`(begin (+ 1 2)(* 1 2)`))
   .toThrow()
 })
+
+test('Evaluate define expression', () => {
+  expect(() => lisp.lisp(`(begin (define r 10) (define sqr (* r r))(sqr))`))
+  .toEqual(100)
+})
+
+test('Evaluate invalid expression', () => {
+  expect(() => lisp.lisp(`(+ 1 2 * 1 2)`))
+  .toThrow()
+})

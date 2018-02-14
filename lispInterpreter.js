@@ -17,8 +17,8 @@ let env = {
   '>=': (x, y) => x >= y,
   'not': (x) => !x,
   'begin': function () {
-    let expr = arguments[arguments.length - 1]
-    return expr[expr.length - 1]
+    let exprs = arguments[arguments.length - 1]
+    return exprs[exprs.length - 1]
   },
   'max': (x, y) => x > y ? x : y,
   'min': (x, y) => x < y ? x : y,
