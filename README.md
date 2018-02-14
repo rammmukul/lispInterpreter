@@ -1,5 +1,6 @@
 # lispInterpreter
 A lisp interpreter in js
 
-usage: `node lispReader.js <lisp program enclosed in "">`
+
+usage: `node lispReader.js <lisp program enclosed in "">`<br>
 REPL: `node repl.js`
