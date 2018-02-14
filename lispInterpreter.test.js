@@ -1,8 +1,8 @@
 const lisp = require('./lispInterpreter')
 
 test('Evaluate add', () => {
-  expect(lisp.lisp(`(+ 1 2)`))
-  .toEqual(3)
+  expect(lisp.lisp(`(+ 1 2 3)`))
+  .toEqual(6)
 })
 
 test('Evaluate nested', () => {
@@ -16,7 +16,7 @@ test('Evaluate define & refrence', () => {
 })
 
 test('Evaluate begin', () => {
-  expect(lisp.lisp(`(begin (10) (20) (30))`))
+  expect(lisp.lisp(`(begin(10)(20)(30))`))
   .toEqual(30)
 })
 
@@ -26,11 +26,16 @@ test('Evaluate max', () => {
 })
 
 test('Evaluate conditional', () => {
-  expect(lisp.lisp(`(if (1>2)(1)(2))`))
+  expect(lisp.lisp(`(if (1>2) 1 2)`))
   .toEqual(2)
 })
 
 test('Evaluate constant(num)', () => {
   expect(lisp.lisp(`(99)`))
   .toEqual(99)
+})
+
+test('Evaluate invalid input', () => {
+  expect(() => lisp.lisp(`(begin (+ 1 2)(* 1 2)`))
+  .toThrow()
 })

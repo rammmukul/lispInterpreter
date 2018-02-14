@@ -1,7 +1,7 @@
 exports.lisp = interpret
 
 function interpret (lispString) {
-  return evaluation(parse(lispString), env)
+  return evaluation(ast(lispString), env)
 }
 
 let env = {
@@ -27,11 +27,33 @@ let env = {
   'number?': x => Number.isFinite(x)
 }
 
-function tokenise (toParse) {
-  return toParse.replace(/\(/g, ' ( ')
-                    .replace(/\)/g, ' ) ')
-                    .split(' ')
-                    .filter(x => x !== '')
+function parse (toParse) {
+  if (toParse[0] !== '(') {
+    return null
+  }
+  let tokens = []
+  let stack = 1
+  tokens.push('(')
+  toParse = toParse.slice(1)
+  let match
+  while (stack !== 0) {
+    if (match = toParse.match(/^\)\s*/)) {
+      toParse = toParse.replace(match[0], '')
+      tokens.push(')')
+      stack--
+    } else if (match = toParse.match(/^\(\s*/)) {
+      toParse = toParse.replace(match[0], '')
+      tokens.push('(')
+      stack++
+    } else {
+      tokens.push((toParse.match(/[^\s()]*/)[0]))
+      toParse = toParse.replace(/[^\s()]*\s*/, '')
+    }
+    if (toParse === '' && stack !== 0) {
+      throw Error('Unexpected end of input')
+    }
+  }
+  return [tokens, toParse]
 }
 
 function astFromTokens (tokensArrray) {
@@ -57,8 +79,8 @@ function atom (token) {
   return isNaN(Number(token)) ? token : Number(token)
 }
 
-function parse (toParse) {
-  return astFromTokens(tokenise(toParse))
+function ast (toParse) {
+  return astFromTokens(parse(toParse)[0])
 }
 
 function evaluation (exp, env) {
