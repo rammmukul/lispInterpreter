@@ -41,7 +41,7 @@ test('Evaluate invalid input', () => {
 })
 
 test('Evaluate define expression', () => {
-  expect(() => lisp.lisp(`(begin (define r 10) (define sqr (* r r))(sqr))`))
+  expect(lisp.lisp(`(begin (define r 10) (define sqr (* r r)) sqr)`))
   .toEqual(100)
 })
 

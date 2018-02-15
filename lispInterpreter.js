@@ -1,8 +1,4 @@
-exports.lisp = interpret
-
-function interpret (lispString) {
-  return evaluation(ast(lispString), env)
-}
+const interpret = lispString => evaluation(ast(lispString), env)
 
 let env = {
   '+': (x, y) => x + y,
@@ -27,7 +23,7 @@ let env = {
   'number?': x => Number.isFinite(x)
 }
 
-function parse (toParse) {
+const parse = toParse => {
   if (toParse[0] !== '(') {
     return null
   }
@@ -56,7 +52,7 @@ function parse (toParse) {
   return [tokens, toParse]
 }
 
-function astFromTokens (tokensArrray) {
+const astFromTokens = tokensArrray => {
   if (tokensArrray.length === 0) {
     throw Error('Unexpected EOF')
   }
@@ -75,32 +71,28 @@ function astFromTokens (tokensArrray) {
   }
 }
 
-function atom (token) {
-  return isNaN(Number(token)) ? token : Number(token)
-}
+const atom = token => isNaN(Number(token)) ? token : Number(token)
 
-function ast (toParse) {
-  return astFromTokens(parse(toParse)[0])
-}
+const ast = toParse => astFromTokens(parse(toParse)[0])
 
 function evaluation (exp, env) {
   if (exp[0] === 'define') {                 // Definition
     let symbol = exp[1]
     let expr = exp.slice(2)
-    env[symbol] = evaluation(expr, env)
-  } else if (exp[0] === 'if') {              // Condition
-    let test = exp[1]
-    let ifTrue = exp[2]
-    let ifFalse = exp[3]
+    env[symbol] = evaluation(expr[0], env)
+  }
+  if (exp[0] === 'if') {              // Condition
+    let [test, ifTrue, ifFalse] = exp.slice(1)
     let expr = evaluation(test, env) ? ifTrue : ifFalse
     return evaluation(expr, env)
-  } else if (env.hasOwnProperty(exp)) {      // Vriable refrance
-    return env[exp[0]]
-  } else if (!env.hasOwnProperty(exp[0])) {  // Constant number
-    return Number(exp)
-  } else {                                   // Procedure call
-    let proc = env[exp[0]]
-    let args = exp.slice(1).map(x => evaluation(x, env))
-    return args.reduce(proc)
   }
+  if (env.hasOwnProperty(exp)) {      // Vriable refrance
+    return env[exp]
+  }
+  if (!env.hasOwnProperty(exp[0])) {  // Constant number
+    return Number(exp)
+  }
+  return exp.slice(1).map(x => evaluation(x, env)).reduce(env[exp[0]])
 }
+
+exports.lisp = interpret
