@@ -5,8 +5,8 @@ let env = {
   '-': args => args.reduce((x, y) => x - y),
   '*': args => args.reduce((x, y) => x * y),
   '/': args => args.reduce((x, y) => x / y),
-  '#t': true,
-  '#f': false,
+  '#t': '#t',
+  '#f': '#f',
   '=': args => args.reduce((x, y) => x === y ? '#t' : '#f'),
   'equal?': args => args.reduce((x, y) => x === y ? '#t' : '#f'),
   '<': args => {
@@ -49,7 +49,7 @@ let env = {
     }
     return result ? '#t' : '#f'
   },
-  'not': (x) => !x, //
+  'not': x => x[0] === '#t' || x[0] !== '#f' ? '#f' : '#t',
   'begin': function () {
     let exprs = arguments[arguments.length - 1]
     return exprs[exprs.length - 1]
@@ -132,7 +132,9 @@ function evaluation (exp, env) {
   }
   let proc = env[exp[0]]
   let args = exp.slice(1).map(x => evaluation(x, env))
-  if (args.filter(x => typeof x !== 'number').length) { throw Error('Unexpected token') }
+  if (args.filter(x => typeof x !== 'number' && !(x === '#t' || x === '#f')).length) {
+    throw Error('Unexpected token')
+  }
   return proc(args)
 }
 
