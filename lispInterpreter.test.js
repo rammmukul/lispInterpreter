@@ -27,12 +27,12 @@ test('Evaluate max', () => {
 
 test('Evaluate multiple args', () => {
   expect(lisp.lisp(`(< 2 1 2)`))
-  .toEqual(false)
+  .toEqual('#f')
 })
 
 test('Evaluate comparision with multiple args', () => {
   expect(lisp.lisp(`(> 2 1 2)`))
-  .toEqual(false)
+  .toEqual('#f')
 })
 
 test('Evaluate conditional', () => {

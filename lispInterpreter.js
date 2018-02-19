@@ -5,47 +5,49 @@ let env = {
   '-': args => args.reduce((x, y) => x - y),
   '*': args => args.reduce((x, y) => x * y),
   '/': args => args.reduce((x, y) => x / y),
-  '=': args => args.reduce((x, y) => x === y),
-  'equal?': args => args.reduce((x, y) => x === y),
+  '#t': true,
+  '#f': false,
+  '=': args => args.reduce((x, y) => x === y ? '#t' : '#f'),
+  'equal?': args => args.reduce((x, y) => x === y ? '#t' : '#f'),
   '<': args => {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return false }
+      if (result) { return '#f' }
       result = prev < args[i]
       prev = args[i]
     }
-    return result
+    return result ? '#t' : '#f'
   },
   '>': args => {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return false }
+      if (result) { return '#f' }
       result = prev > args[i]
       prev = args[i]
     }
-    return result
+    return result ? '#t' : '#f'
   },
   '<=': args => {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return false }
+      if (result) { return '#f' }
       result = prev <= args[i]
       prev = args[i]
     }
-    return result
+    return result ? '#t' : '#f'
   },
   '>=': args => {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return false }
+      if (result) { return '#f' }
       result = prev >= args[i]
       prev = args[i]
     }
-    return result
+    return result ? '#t' : '#f'
   },
   'not': (x) => !x, //
   'begin': function () {
@@ -55,8 +57,8 @@ let env = {
   'max': args => args.reduce((x, y) => x > y ? x : y),
   'min': args => args.reduce((x, y) => x < y ? x : y),
   'length': x => x.length, //
-  'null?': x => x === null,
-  'number?': x => Number.isFinite(x)
+  'null?': x => x === null ? '#t' : '#f',
+  'number?': x => Number.isFinite(x) ? '#t' : '#f'
 }
 
 const parse = toParse => {
@@ -119,7 +121,7 @@ function evaluation (exp, env) {
   }
   if (exp[0] === 'if') {              // Condition
     let [test, ifTrue, ifFalse] = exp.slice(1)
-    let expr = evaluation(test, env) ? ifTrue : ifFalse
+    let expr = evaluation(test, env) === '#t' ? ifTrue : ifFalse
     return evaluation(expr, env)
   }
   if (env.hasOwnProperty(exp)) {      // Variable Reference
