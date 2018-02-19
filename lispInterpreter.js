@@ -1,24 +1,24 @@
 const interpret = lispString => evaluation(ast(lispString), env)
 
 let env = {
-  '+': (x, y) => x + y,
-  '-': (x, y) => x - y,
-  '*': (x, y) => x * y,
-  '/': (x, y) => x / y,
-  '=': (x, y) => x === y,
-  'equal?': (x, y) => x === y,
-  '<': (x, y) => x < y,
-  '>': (x, y) => x > y,
-  '<=': (x, y) => x <= y,
-  '>=': (x, y) => x >= y,
-  'not': (x) => !x,
+  '+': args => args.reduce((x, y) => x + y),
+  '-': args => args.reduce((x, y) => x - y),
+  '*': args => args.reduce((x, y) => x * y),
+  '/': args => args.reduce((x, y) => x / y),
+  '=': args => args.reduce((x, y) => x === y),
+  'equal?': args => args.reduce((x, y) => x === y),
+  '<': (x, y) => x < y, //
+  '>': (x, y) => x > y, //
+  '<=': (x, y) => x <= y, //
+  '>=': (x, y) => x >= y, //
+  'not': (x) => !x, //
   'begin': function () {
     let exprs = arguments[arguments.length - 1]
     return exprs[exprs.length - 1]
   },
-  'max': (x, y) => x > y ? x : y,
-  'min': (x, y) => x < y ? x : y,
-  'length': x => x.length,
+  'max': args => args.reduce((x, y) => x > y ? x : y),
+  'min': args => args.reduce((x, y) => x < y ? x : y),
+  'length': x => x.length, //
   'null?': x => x === null,
   'number?': x => Number.isFinite(x)
 }
@@ -28,24 +28,24 @@ const parse = toParse => {
     return null
   }
   let tokens = []
-  let stack = 1
+  let openPrans = 1
   tokens.push('(')
   toParse = toParse.slice(1)
   let match
-  while (stack !== 0) {
+  while (openPrans !== 0) {
     if (match = toParse.match(/^\)\s*/)) {
       toParse = toParse.replace(match[0], '')
       tokens.push(')')
-      stack--
+      openPrans--
     } else if (match = toParse.match(/^\(\s*/)) {
       toParse = toParse.replace(match[0], '')
       tokens.push('(')
-      stack++
+      openPrans++
     } else {
       tokens.push((toParse.match(/[^\s()]*/)[0]))
       toParse = toParse.replace(/[^\s()]*\s*/, '')
     }
-    if (toParse === '' && stack !== 0) {
+    if (toParse === '' && openPrans !== 0) {
       throw Error('Unexpected end of input')
     }
   }
@@ -58,12 +58,12 @@ const astFromTokens = tokensArrray => {
   }
   let token = tokensArrray.shift()
   if (token === '(') {
-    let nest = []
+    let expression = []
     while (tokensArrray[0] !== ')') {
-      nest.push(astFromTokens(tokensArrray))
+      expression.push(astFromTokens(tokensArrray))
     }
     tokensArrray.shift()
-    return nest
+    return expression
   } else if (token === ')') {
     throw Error('Unexpected )')
   } else {
@@ -86,13 +86,15 @@ function evaluation (exp, env) {
     let expr = evaluation(test, env) ? ifTrue : ifFalse
     return evaluation(expr, env)
   }
-  if (env.hasOwnProperty(exp)) {      // Vriable refrance
+  if (env.hasOwnProperty(exp)) {      // Variable Reference
     return env[exp]
   }
   if (!env.hasOwnProperty(exp[0])) {  // Constant number
     return Number(exp)
   }
-  return exp.slice(1).map(x => evaluation(x, env)).reduce(env[exp[0]])
+  let proc = env[exp[0]]
+  let args = exp.slice(1).map(x => evaluation(x, env))
+  return proc(args)
 }
 
 exports.lisp = interpret
