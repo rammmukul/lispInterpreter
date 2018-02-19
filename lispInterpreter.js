@@ -94,6 +94,7 @@ function evaluation (exp, env) {
   }
   let proc = env[exp[0]]
   let args = exp.slice(1).map(x => evaluation(x, env))
+  if (args.filter(x => typeof x !== 'number').length) { throw Error('Unexpected token') }
   return proc(args)
 }
 
