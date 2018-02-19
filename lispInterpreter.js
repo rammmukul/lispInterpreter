@@ -7,10 +7,46 @@ let env = {
   '/': args => args.reduce((x, y) => x / y),
   '=': args => args.reduce((x, y) => x === y),
   'equal?': args => args.reduce((x, y) => x === y),
-  '<': (x, y) => x < y, //
-  '>': (x, y) => x > y, //
-  '<=': (x, y) => x <= y, //
-  '>=': (x, y) => x >= y, //
+  '<': args => {
+    let result = true
+    let prev = args[0]
+    for (let i = 1; i < args.length; i++) {
+      if (result) { return false }
+      result = prev < args[i]
+      prev = args[i]
+    }
+    return result
+  },
+  '>': args => {
+    let result = true
+    let prev = args[0]
+    for (let i = 1; i < args.length; i++) {
+      if (result) { return false }
+      result = prev > args[i]
+      prev = args[i]
+    }
+    return result
+  },
+  '<=': args => {
+    let result = true
+    let prev = args[0]
+    for (let i = 1; i < args.length; i++) {
+      if (result) { return false }
+      result = prev <= args[i]
+      prev = args[i]
+    }
+    return result
+  },
+  '>=': args => {
+    let result = true
+    let prev = args[0]
+    for (let i = 1; i < args.length; i++) {
+      if (result) { return false }
+      result = prev >= args[i]
+      prev = args[i]
+    }
+    return result
+  },
   'not': (x) => !x, //
   'begin': function () {
     let exprs = arguments[arguments.length - 1]
@@ -76,7 +112,7 @@ const atom = token => isNaN(Number(token)) ? token : Number(token)
 const ast = toParse => astFromTokens(parse(toParse)[0])
 
 function evaluation (exp, env) {
-  if (exp[0] === 'define') {                 // Definition
+  if (exp[0] === 'define') {          // Definition
     let symbol = exp[1]
     let expr = exp.slice(2)
     env[symbol] = evaluation(expr[0], env)
