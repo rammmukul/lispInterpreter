@@ -1,6 +1,33 @@
-const interpret = lispString => evaluation(ast(lispString), env)
+const interpret = lispString => evaluation(ast(lispString), globEnv)
 
-let env = {
+let Env = {
+  'constructor': function (prams = [], args = [], outer = null) {
+    let env = Object.assign({}, this)
+    for (let i = 0; i < prams.length; i++) {
+      env[prams[i]] = args[i]
+    }
+    env.outer = outer
+    return env
+  },
+  'find': function (variable) {
+    return this[variable] ? this : this.outer.find(variable)
+  }
+}
+
+const procedure = {
+  'constructor': function (prams, body, env) {
+    let proc = Object.assign({}, this)
+    proc.prams = prams
+    proc.body = body
+    proc.env = env
+    return proc
+  },
+  'call': function (obj, args) {
+    return evaluation(this.body, Env.constructor(this.prams, args, this.env))
+  }
+}
+
+let globEnv = {
   '+': args => args.reduce((x, y) => x + y),
   '-': args => args.reduce((x, y) => x - y),
   '*': args => args.reduce((x, y) => x * y),
@@ -13,7 +40,7 @@ let env = {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return '#f' }
+      if (!result) { return '#f' }
       result = prev < args[i]
       prev = args[i]
     }
@@ -23,7 +50,7 @@ let env = {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return '#f' }
+      if (!result) { return '#f' }
       result = prev > args[i]
       prev = args[i]
     }
@@ -33,7 +60,7 @@ let env = {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return '#f' }
+      if (!result) { return '#f' }
       result = prev <= args[i]
       prev = args[i]
     }
@@ -43,7 +70,7 @@ let env = {
     let result = true
     let prev = args[0]
     for (let i = 1; i < args.length; i++) {
-      if (result) { return '#f' }
+      if (!result) { return '#f' }
       result = prev >= args[i]
       prev = args[i]
     }
@@ -58,7 +85,10 @@ let env = {
   'min': args => args.reduce((x, y) => x < y ? x : y),
   'length': x => x.length, //
   'null?': x => x === null ? '#t' : '#f',
-  'number?': x => Number.isFinite(x) ? '#t' : '#f'
+  'number?': x => Number.isFinite(x) ? '#t' : '#f',
+  'find': function (variable) {
+    return this[variable] ? this : null
+  }
 }
 
 const parse = toParse => {
@@ -114,28 +144,37 @@ const atom = token => isNaN(Number(token)) ? token : Number(token)
 const ast = toParse => astFromTokens(parse(toParse)[0])
 
 function evaluation (exp, env) {
+  console.log(exp)
   if (exp[0] === 'define') {          // Definition
     let symbol = exp[1]
     let expr = exp.slice(2)
     env[symbol] = evaluation(expr[0], env)
+    return null
   }
   if (exp[0] === 'if') {              // Condition
     let [test, ifTrue, ifFalse] = exp.slice(1)
     let expr = evaluation(test, env) === '#t' ? ifTrue : ifFalse
     return evaluation(expr, env)
   }
-  if (env.hasOwnProperty(exp)) {      // Variable Reference
-    return env[exp]
+  if (env.find(exp)) {                // Variable Reference
+    return env.find(exp)[exp]
   }
-  if (!env.hasOwnProperty(exp[0])) {  // Constant number
+  if (!Array.isArray(exp)) {          // Constant number
     return Number(exp)
   }
-  let proc = env[exp[0]]
-  let args = exp.slice(1).map(x => evaluation(x, env))
-  if (args.filter(x => typeof x !== 'number' && !(x === '#t' || x === '#f')).length) {
-    throw Error('Unexpected token')
+  if (Number(exp[0])) {
+    return Number(exp[0])
   }
-  return proc(args)
+  if (exp[0] === 'lambda') {          // procedure
+    let proc = procedure.constructor(exp[1], exp[2], env)
+    if (!exp[3]) {
+      return proc
+    }
+    return proc.call(null, exp.slice(2))
+  }
+  let proc = env.find(exp[0])[exp[0]]
+  let args = exp.slice(1).map(x => evaluation(x, env))
+  return proc.call(null, args)
 }
 
 exports.lisp = interpret

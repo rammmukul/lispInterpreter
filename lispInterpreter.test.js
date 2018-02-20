@@ -16,7 +16,7 @@ test('Evaluate define & refrence', () => {
 })
 
 test('Evaluate begin', () => {
-  expect(lisp.lisp(`(begin(10)(20)(30))`))
+  expect(lisp.lisp(`(begin 10  20 30)`))
   .toEqual(30)
 })
 
@@ -38,10 +38,19 @@ test('Evaluate comparision with multiple args', () => {
 test('Evaluate conditional', () => {
   expect(lisp.lisp(`(if (> 1 2) 1 2)`))
   .toEqual(2)
+  expect(lisp.lisp(`(if (> 2 1) 1 2)`))
+  .toEqual(1)
+})
+
+test('Evaluate not', () => {
+  expect(lisp.lisp(`(not #f)`))
+  .toEqual('#t')
+  expect(lisp.lisp(`(not #t)`))
+  .toEqual('#f')
 })
 
 test('Evaluate constant(num)', () => {
-  expect(lisp.lisp(`(99)`))
+  expect(lisp.lisp(`(+ 99 )`))
   .toEqual(99)
 })
 
