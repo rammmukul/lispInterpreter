@@ -76,7 +76,7 @@ let globEnv = {
     }
     return result ? '#t' : '#f'
   },
-  'not': x => x[0] === '#t' || x[0] !== '#f' ? '#f' : '#t',
+  'not': x => x[0] !== '#f' ? '#f' : '#t',
   'begin': function () {
     let exprs = arguments[arguments.length - 1]
     return exprs[exprs.length - 1]
@@ -171,6 +171,13 @@ function evaluation (exp, env) {
       return proc
     }
     return proc.call(null, exp.slice(2))
+  }
+  if (exp[0][0] === 'lambda') {          // procedure
+    let proc = procedure.constructor(exp[0][1], exp[0][2], env)
+    if (!exp[1]) {
+      return proc
+    }
+    return proc.call(null, exp.slice(1))
   }
   let proc = env.find(exp[0])[exp[0]]
   let args = exp.slice(1).map(x => evaluation(x, env))
