@@ -86,6 +86,7 @@ let globEnv = {
   'length': x => x.length, //
   'null?': x => x === null ? '#t' : '#f',
   'number?': x => Number.isFinite(x) ? '#t' : '#f',
+  'pi': 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679,
   'find': function (variable) {
     return this[variable] ? this : null
   }
@@ -144,7 +145,6 @@ const atom = token => isNaN(Number(token)) ? token : Number(token)
 const ast = toParse => astFromTokens(parse(toParse)[0])
 
 function evaluation (exp, env) {
-  console.log(exp)
   if (exp[0] === 'define') {          // Definition
     let symbol = exp[1]
     let expr = exp.slice(2)
@@ -160,24 +160,17 @@ function evaluation (exp, env) {
     return env.find(exp)[exp]
   }
   if (!Array.isArray(exp)) {          // Constant number
-    return Number(exp)
+    return Number(exp) ? Number(exp) : null
+  }
+  if (Array.isArray(exp[0])) {
+    return evaluation(exp, env)
   }
   if (Number(exp[0])) {
     return Number(exp[0])
   }
   if (exp[0] === 'lambda') {          // procedure
     let proc = procedure.constructor(exp[1], exp[2], env)
-    if (!exp[3]) {
-      return proc
-    }
-    return proc.call(null, exp.slice(2))
-  }
-  if (exp[0][0] === 'lambda') {          // procedure
-    let proc = procedure.constructor(exp[0][1], exp[0][2], env)
-    if (!exp[1]) {
-      return proc
-    }
-    return proc.call(null, exp.slice(1))
+    return proc
   }
   let proc = env.find(exp[0])[exp[0]]
   let args = exp.slice(1).map(x => evaluation(x, env))
