@@ -145,36 +145,40 @@ const atom = token => isNaN(Number(token)) ? token : Number(token)
 const ast = toParse => astFromTokens(parse(toParse)[0])
 
 function evaluation (exp, env) {
-  if (exp[0] === 'define') {          // Definition
-    let symbol = exp[1]
-    let expr = exp.slice(2)
-    env[symbol] = evaluation(expr[0], env)
-    return null
-  }
-  if (exp[0] === 'if') {              // Condition
-    let [test, ifTrue, ifFalse] = exp.slice(1)
-    let expr = evaluation(test, env) === '#t' ? ifTrue : ifFalse
-    return evaluation(expr, env)
-  }
   if (env.find(exp)) {                // Variable Reference
     return env.find(exp)[exp]
   }
   if (!Array.isArray(exp)) {          // Constant number
     return Number(exp) ? Number(exp) : null
   }
-  if (Array.isArray(exp[0])) {
-    return evaluation(exp, env)
+  if (exp[0] === 'if') {              // Condition
+    let [test, ifTrue, ifFalse] = exp.slice(1)
+    let expr = evaluation(test, env) === '#t' ? ifTrue : ifFalse
+    return evaluation(expr, env)
   }
-  if (Number(exp[0])) {
-    return Number(exp[0])
+  if (exp[0] === 'define') {          // Definition
+    let symbol = exp[1]
+    let expr = exp.slice(2)
+    env[symbol] = evaluation(expr[0], env)
+  }
+  if (exp[0] === 'set!') {            // Assignment
+    let symbol = exp[1]
+    let expr = exp.slice(2)
+    env.find(symbol)[symbol] = evaluation(expr, env)
   }
   if (exp[0] === 'lambda') {          // procedure
-    let proc = procedure.constructor(exp[1], exp[2], env)
+    let prams = exp[1]
+    let body = exp[2]
+    let proc = procedure.constructor(prams, body, env)
     return proc
   }
-  let proc = env.find(exp[0])[exp[0]]
+  let proc = evaluation(exp[0], env)  // Procedure call
   let args = exp.slice(1).map(x => evaluation(x, env))
-  return proc.call(null, args)
+  if (proc && args) {
+    return proc.call(null, args)
+  } else {
+    console.log(exp)
+  }
 }
 
 exports.lisp = interpret

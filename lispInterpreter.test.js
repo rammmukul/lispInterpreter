@@ -64,6 +64,16 @@ test('Evaluate define expression', () => {
   .toEqual(100)
 })
 
+test('Evaluate factorial', () => {
+  expect(lisp.lisp(`(begin (define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))(fact 10))`))
+  .toEqual(3628800)
+})
+
+test('Evaluate fib', () => {
+  expect(lisp.lisp(`(begin (define fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))(fib 10))`))
+  .toEqual(89)
+})
+
 test('Evaluate invalid expression', () => {
   expect(() => lisp.lisp(`(+ 1 2 * 1 2)`))
   .toThrow()
