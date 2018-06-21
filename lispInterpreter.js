@@ -94,7 +94,7 @@ let globEnv = {
 
 const parse = toParse => {
   if (toParse[0] !== '(') {
-    return null
+    return Number(toParse) ? [[Number(toParse)]] : [[toParse]]
   }
   let tokens = []
   let openPrans = 1
