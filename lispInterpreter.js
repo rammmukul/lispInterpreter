@@ -29,21 +29,21 @@ const procedure = {
 
 let globEnv = {
   '+': args => args.map(x => {
-    if(!Number(x)) throw Error(`+: number required, but got ${typeof x}`)
-    return x}
-  ).reduce((x, y) => x + y),
+    if (!Number(x)) throw Error(`+: number required, but got ${typeof x}`)
+    return x
+  }).reduce((x, y) => x + y),
   '-': args => args.map(x => {
-    if(!Number(x)) throw Error(`-: number required, but got ${typeof x}`)
-    return x}
-  ).reduce((x, y) => x - y),
+    if (!Number(x)) throw Error(`-: number required, but got ${typeof x}`)
+    return x
+  }).reduce((x, y) => x - y),
   '*': args => args.map(x => {
-    if(!Number(x)) throw Error(`*: number required, but got ${typeof x}`)
-    return x}
-  ).reduce((x, y) => x * y),
+    if (!Number(x)) throw Error(`*: number required, but got ${typeof x}`)
+    return x
+  }).reduce((x, y) => x * y),
   '/': args => args.map(x => {
-    if(!Number(x)) throw Error(`/: number required, but got ${typeof x}`)
-    return x}
-  ).reduce((x, y) => x / y),
+    if (!Number(x)) throw Error(`/: number required, but got ${typeof x}`)
+    return x
+  }).reduce((x, y) => x / y),
   '#t': '#t',
   '#f': '#f',
   '=': args => args.reduce((x, y) => x === y ? '#t' : '#f'),
