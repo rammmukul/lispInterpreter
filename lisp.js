@@ -1,7 +1,7 @@
-const lisp = require('./lispInterpreter')
+import lisp from './lispInterpreter.js'
 
 if (process.argv.length === 3) {
-  console.log(lisp.lisp(process.argv[2]))
+  console.log(lisp(process.argv[2]))
   process.exit()
 }
 
@@ -14,7 +14,7 @@ process.openStdin().addListener('data', function (input) {
     checkCompletion(i)
   }
   if (toParse && stack === 0) {
-    console.log(lisp.lisp(toParse))
+    console.log(lisp(toParse))
     process.stdout.write('lp> ')
     toParse = ''
   } else if (stack > 0) {

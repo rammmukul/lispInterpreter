@@ -1,4 +1,4 @@
-const interpret = lispString => evaluation(ast(lispString), globEnv)
+export default lispString => evaluation(ast(lispString), globEnv)
 
 let Env = {
   'constructor': function (prams = [], args = [], outer = null) {
@@ -192,5 +192,3 @@ function evaluation (exp, env) {
     console.log(exp)
   }
 }
-
-exports.lisp = interpret
